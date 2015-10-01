@@ -75,16 +75,14 @@ public:
 		}
 
 		this->getProp(p, "name",            CFSTR("DeviceName"));
-		this->getProp(p, "buildVersion",    CFSTR("BuildVersion"));
-		this->getProp(p, "cpuArchitecture", CFSTR("CPUArchitecture"));
 		this->getProp(p, "deviceClass",     CFSTR("DeviceClass"));
 		this->getProp(p, "deviceColor",     CFSTR("DeviceColor"));
-		this->getProp(p, "hardwareModel",   CFSTR("HardwareModel"));
 		this->getProp(p, "modelNumber",     CFSTR("ModelNumber"));
-		this->getProp(p, "productType",     CFSTR("ProductType"));
 		this->getProp(p, "productVersion",  CFSTR("ProductVersion"));
 		this->getProp(p, "serialNumber",    CFSTR("SerialNumber"));
-
+		this->getProp(p, "imei",            CFSTR("InternationalMobileEquipmentIdentity"));
+		this->getProp(p, "meid",            CFSTR("InternationalMobileSubscriberIdentity"));
+		
 		props.Reset(p);
 	}
 
