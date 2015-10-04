@@ -1,10 +1,8 @@
 NODE_GYP=node node_modules/node-gyp/bin/node-gyp
 
-all: node iojs
+all: node
 
-node: node_v1 node_v11 node_v14 node_v46
-
-iojs: iojs_v42 iojs_v43 iojs_v44 iojs_v45
+node: node_v46
 
 build = stat node_modules/node-gyp > /dev/null 2>&1 || npm install; \
         $(NODE_GYP) clean; \
@@ -34,24 +32,8 @@ node_v14:
 node_v46:
 	$(call build,node,nodejs.org,4.0.0)
 
-# io.js 1.0.x
-iojs_v42:
-	$(call build,iojs,iojs.org,1.0.4)
-
-# io.js ^1.1.0
-iojs_v43:
-	$(call build,iojs,iojs.org,1.8.2)
-
-# io.js 2.x
-iojs_v44:
-	$(call build,iojs,iojs.org,2.5.0)
-
-# io.js 3.x
-iojs_v45:
-	$(call build,iojs,iojs.org,3.3.0)
-
 clean:
 	$(NODE_GYP) clean
 	rm -rf out
 
-.PHONY: clean node_v1 node_v11 node_v14 node_v46 iojs_v42 iojs_v43 iojs_v44 iojs_v45
+.PHONY: clean node_v46

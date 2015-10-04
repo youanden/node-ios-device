@@ -1,25 +1,9 @@
-# node-ios-device [![Build Status](https://travis-ci.org/appcelerator/node-ios-device.svg?branch=master)](https://travis-ci.org/appcelerator/node-ios-device)
+# node-ios-device (useless fork)
 
-Queries connected iOS devices and installs apps.
+This fork is built for my requirements, and as such should not be used unless you're me.
 
-[![NPM](https://nodei.co/npm/node-ios-device.png?downloads=true&stars=true)](https://nodei.co/npm/node-ios-device/)
+If you came looking for the original repository, check out [this](https://github.com/appcelerator/node-ios-device).
 
-## Prerequisites
-
-node-ios-device is currently compatible with the following versions:
-
- * Node.js
-   * 0.8.x (module API v1)
-   * 0.10.x (module API v11)
-   * 0.12.x (module API v14)
-   * 4.0.x (module API v46)
- * io.js
-   * 1.0.x (module API v42)
-   * \^1.1.0 (module API v43)
-   * 2.x (module API v44)
-   * 3.x (module API v45)
-
-Only Mac OS X is supported.
 
 ## Installation
 

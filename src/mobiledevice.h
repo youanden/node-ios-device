@@ -29,23 +29,13 @@ extern "C" {
  */
 #include <stdint.h>
 
-#ifndef __GNUC__
-#pragma pack
-#define __PACK
-#else
 #define __PACK __attribute__((__packed__))
-#endif
 
-#if defined(WIN32)
-#	define __DLLIMPORT [DllImport("iTunesMobileDevice.dll")]
-	using namespace System::Runtime::InteropServices;
-#	include <CoreFoundation.h>
-	typedef unsigned int mach_error_t;
-#elif defined(__APPLE__)
-#	define __DLLIMPORT
-#	include <CoreFoundation/CoreFoundation.h>
-#	include <mach/error.h>
-#endif
+
+#define __DLLIMPORT
+#include <CoreFoundation/CoreFoundation.h>
+#include <mach/error.h>
+
 
 /* Error codes */
 #define MDERR_APPLE_MOBILE		(err_system(0x3a))
@@ -71,22 +61,8 @@ extern "C" {
 
 #define AMD_IPHONE_PRODUCT_ID   0x1290
 
-/* Services, found in /System/Library/Lockdown/Services.plist */
-#define AMSVC_AFC                   "com.apple.afc"
-#define AMSVC_AFC2                  "com.apple.afc2"
-#define AMSVC_BACKUP                "com.apple.mobilebackup"
-#define AMSVC_CRASH_REPORT_COPY     "com.apple.crashreportcopy"
-#define AMSVC_DEBUG_IMAGE_MOUNT     "com.apple.mobile.debug_image_mount"
-#define AMSVC_NOTIFICATION_PROXY    "com.apple.mobile.notification_proxy"
-#define AMSVC_PURPLE_TEST           "com.apple.purpletestr"
-#define AMSVC_SOFTWARE_UPDATE       "com.apple.mobile.software_update"
-#define AMSVC_SYNC                  "com.apple.mobilesync"
-#define AMSVC_SCREENSHOT            "com.apple.screenshotr"
-#define AMSVC_SYSLOG_RELAY          "com.apple.syslog_relay"
-#define AMSVC_SYSTEM_PROFILER       "com.apple.mobile.system_profiler"
-
 typedef uint32_t afc_error_t;
-typedef uint64_t afc_file_ref;
+// typedef uint64_t afc_file_ref;
 typedef uint32_t service_conn_t;
 
 /* opaque structures */
@@ -94,7 +70,6 @@ typedef struct _am_device				*am_device;
 typedef struct _am_service				*am_service;
 typedef struct _afc_connection			*afc_connection;
 typedef struct _am_device_notification	*am_device_notification;
-typedef struct _afc_directory			*afc_directory;
 typedef struct _afc_dictionary			*afc_dictionary;
 
 /* Messages passed to device notification callbacks: passed as part of
@@ -118,22 +93,6 @@ typedef void (*am_device_notification_callback)(
 /* ----------------------------------------------------------------------------
  *   Public routines
  * ------------------------------------------------------------------------- */
-
-mach_error_t AMDeviceSecureTransferPath(
-	uint32_t unknown0,
-	am_device device,
-	CFURLRef url,
-	CFDictionaryRef options,
-	void* callback,
-	int callback_arg);
-
-mach_error_t AMDeviceSecureInstallApplication(
-	uint32_t unknown0,
-	am_device device,
-	CFURLRef url,
-	CFDictionaryRef options,
-	void* callback,
-	int callback_arg);
 
 /* Registers a notification with the current run loop. The callback gets
  * copied into the notification struct, as well as being registered with the
@@ -245,19 +204,6 @@ mach_error_t AMDeviceStartService(
 mach_error_t AMDeviceStopSession(
 	am_device device);
 
-/* Opens an Apple File Connection. You must start the appropriate service
- * first with AMDeviceStartService(). In iTunes, io_timeout is 0.
- *
- * Returns:
- *      MDERR_OK                if successful
- *      MDERR_AFC_OUT_OF_MEMORY if malloc() failed
- */
-
-afc_error_t AFCDirectoryAccessOpen(
-	am_service handle,
-	uint32_t io_timeout,
-    afc_connection *conn);
-
 /* Retrieves an afc_dictionary that describes the connected device.  To
  * extract values from the dictionary, use AFCKeyValueRead() and close
  * it when finished with AFCKeyValueClose()
@@ -270,142 +216,9 @@ afc_error_t AFCDeviceInfoOpen(
  * value, or if the file '/AFCDEBUG' is present and contains a value. */
 void AFCPlatformInit();
 
-/* Opens a directory on the iPhone. Retrieves an afc_directory which can be
- * queried (with AFCDirectoryRead()) to enumerate through the filenames in
- * the directory.  Once finished, close with AFCDirectoryClose()
- *
- * Note that this normally only accesses the iTunes sandbox/partition as the
- * root, which is /var/root/Media. Pathnames are specified with '/' delimiters
- * as in Unix style.
- *
- * Returns:
- *      MDERR_OK                if successful
- */
-
-afc_error_t AFCDirectoryOpen(
-	afc_connection conn,
-	const char *path,
-	afc_directory *dir);
-
-/* Acquires the next entry in a directory previously opened with
- * AFCDirectoryOpen(). When dirent is filled with a NULL value, then the end
- * of the directory has been reached. '.' and '..' will be returned as the
- * first two entries in each directory except the root; you may want to skip
- * over them.
- *
- * Returns:
- *      MDERR_OK                if successful, even if no entries remain
- */
-
-afc_error_t AFCDirectoryRead(
-	afc_connection conn,
-	afc_directory dir,
-    char **dirent);
-
-/* Close the directory previously opened with AFCDirectoryOpen()
- */
-afc_error_t AFCDirectoryClose(
-	afc_connection conn,
-	afc_directory dir);
-
-/* Create a new directory on the device.
- */
-afc_error_t AFCDirectoryCreate(
-	afc_connection conn,
-	const char *dirname);
-
-/* Removes an existing file or directory from the device.
- */
-afc_error_t AFCRemovePath(
-	afc_connection conn,
-	const char *dirname);
-
-/* Renames an existing file or directory on the device */
-afc_error_t AFCRenamePath(
-	afc_connection conn,
-	const char *from,
-	const char *to);
-
-/* Returns the context field of the given AFC connection. */
-uint32_t AFCDirectoryAccessGetContext(
-	afc_connection conn);
-
-/* Set the context field of the given AFC connection.
- */
-uint32_t AFCDirectoryAccessSetContext(
-	afc_connection conn,
-	uint32_t ctx);
-
-/* Returns the fs_block_size field of the given AFC connection. */
-uint32_t AFCDirectoryAccessGetFSBlockSize(
-	afc_connection conn);
-
-/* Returns the io_timeout field of the given AFC connection. In iTunes this is 0. */
-uint32_t AFCDirectoryAccessGetIOTimeout(
-	afc_connection conn);
-
-uint32_t AFCDirectoryAccessSetIOTimeout(
-	afc_connection conn,
-	uint32_t timeout);
-
-/* Returns the sock_block_size field of the given AFC connection. */
-uint32_t AFCDirectoryAccessGetSocketBlockSize(
-	afc_connection conn);
-
-/* Closes the given AFC connection. */
-afc_error_t AFCDirectoryAccessClose(
-	afc_connection conn);
-
 /* ----------------------------------------------------------------------------
  *   Less-documented public routines
  * ------------------------------------------------------------------------- */
-
-afc_error_t AFCFileRefOpen(
-	afc_connection conn,
-	const char *path,				/* pathname of file to open */
-    uint64_t mode,					/* 1=read, 2=write, 3=read/write */
-	afc_file_ref *ref);
-
-afc_error_t AFCFileRefSeek(
-	afc_connection conn,
-	afc_file_ref ref,
-	int64_t offset,				/* signed offset from pos */
-	uint64_t pos);				/* 0=SEEK_SET, 1=SEEK_CUR, 2=SEEK_END */
-
-afc_error_t AFCFileRefTell(
-	afc_connection conn,
-	afc_file_ref ref,
-	uint64_t *offset);
-
-// afc_error_t AFCFileRefLock(afc_connection *conn, afc_file_ref ref,
-//    ...);
-// int _AFCDirectoryAccessIsValid(afc_connection *conn)
-
-afc_error_t AFCFileRefRead(
-	afc_connection conn,
-	afc_file_ref ref,
-    void *buf,
-	uint32_t *len);
-
-afc_error_t AFCFileRefSetFileSize(
-	afc_connection conn,
-	afc_file_ref ref,
-    uint64_t offset);
-
-afc_error_t AFCFileRefWrite(
-	afc_connection conn,
-	afc_file_ref ref,
-    const void *buf,
-	uint32_t len);
-
-afc_error_t AFCFileRefClose(
-	afc_connection conn,
-	afc_file_ref ref);
-
-afc_error_t AFCFileInfoOpen(
-	afc_connection conn,
-	const char *path,
-	afc_dictionary *info);
 
 afc_error_t AFCKeyValueRead(
 	afc_dictionary dict,
@@ -416,7 +229,6 @@ afc_error_t AFCKeyValueClose(
 	afc_dictionary dict);
 
 uint32_t AMDeviceGetConnectionID(am_device device);
-mach_error_t AMDeviceEnterRecovery(am_device device);
 mach_error_t AMDeviceDisconnect(am_device device);
 mach_error_t AMDeviceRetain(am_device device);
 mach_error_t AMDeviceRelease(am_device device);
@@ -483,11 +295,6 @@ CFStringRef AMDeviceCopyDeviceIdentifier(
 
 mach_error_t AMDShutdownNotificationProxy(
 	void *);
-
-/*edits by geohot*/
-mach_error_t AMDeviceDeactivate(am_device device);
-mach_error_t AMDeviceActivate(am_device device, CFMutableDictionaryRef);
-/*end*/
 
 #ifdef __cplusplus
 }

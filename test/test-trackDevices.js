@@ -6,4 +6,4 @@ iosDevice.trackDevices(function (err, devices) {
 		process.exit(1);
 	}
 	console.log(devices);
-});
+}, 1000);

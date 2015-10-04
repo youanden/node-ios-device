@@ -13,8 +13,7 @@
 
 'use strict';
 
-var exec = require('child_process').exec,
-	fs = require('fs'),
+var fs = require('fs'),
 	path = require('path'),
 
 	// flag used to make sure we don't require the native module twice
@@ -81,12 +80,12 @@ exports.devices = lockAndLoad(function (callback) {
  * device is connected or disconnected, the specified callback is fired.
  *
  * @param {Function} callback(err, devices) - A function to call with the connected devices.
- * @returns {Function} off() - A function that discontinues tracking.
+ * @returns {Function} off() - A function  that discontinues tracking.
  */
-exports.trackDevices = lockAndLoad(function (callback) {
+exports.trackDevices = lockAndLoad(function (callback, pumpInterval) {
 	// if we're not already pumping, start up the pumper
 	if (!pumping) {
-		interval = setInterval(iosDeviceModule.pumpRunLoop, exports.pumpInterval);
+		interval = setInterval(iosDeviceModule.pumpRunLoop, pumpInterval);
 	}
 	pumping++;
 
@@ -96,64 +95,8 @@ exports.trackDevices = lockAndLoad(function (callback) {
 	var off = false;
 
 	// listen for any device connects or disconnects
-	iosDeviceModule.on("devicesChanged", function (devices) {
+	iosDeviceModule.on('devicesChanged', function () {
 		off || callback(null, iosDeviceModule.devices());
-	});
-
-	// return the off() function
-	return function () {
-		if (!off) {
-			off = true;
-			pumping = Math.max(pumping - 1, 0);
-			pumping || clearInterval(interval);
-		}
-	};
-});
-
-/**
- * Installs an iOS app on the specified device.
- *
- * @param {String} udid - The device udid to install the app to.
- * @param {String} appPath - The path to iOS .app directory to install.
- * @param {Function} callback(err) - A function to call when the install finishes.
- */
-exports.installApp = lockAndLoad(function (udid, appPath, callback) {
-	appPath = path.resolve(appPath);
-
-	if (!fs.existsSync(appPath)) {
-		return callback(new Error('Specified .app path does not exist'));
-	}
-	if (!fs.statSync(appPath).isDirectory() || !fs.existsSync(path.join(appPath, 'PkgInfo'))) {
-		return callback(new Error('Specified .app path is not a valid app'));
-	}
-
-	iosDeviceModule.pumpRunLoop();
-
-	try {
-		iosDeviceModule.installApp(udid, appPath);
-		callback(null);
-	} catch (ex) {
-		callback(ex);
-	}
-});
-
-/**
- * Forwards the specified iOS device's log messages.
- *
- * @param {String} udid - The device udid to forward log messages.
- * @param {Function} callback(err) - A function to call with each log message.
- */
-exports.log = lockAndLoad(function (udid, callback) {
-	// if we're not already pumping, start up the pumper
-	if (!pumping) {
-		interval = setInterval(iosDeviceModule.pumpRunLoop, exports.pumpInterval);
-	}
-	pumping++;
-
-	var off = false;
-
-	iosDeviceModule.log(udid, function (msg) {
-		off || callback(msg);
 	});
 
 	// return the off() function
