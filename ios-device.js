@@ -61,7 +61,7 @@ function lockAndLoad(fn) {
 			initialized = true;
 		}
 
-		fn.apply(null, args);
+		return fn.apply(null, args);
 	};
 }
 
@@ -95,7 +95,7 @@ exports.trackDevices = lockAndLoad(function (callback, pumpInterval) {
 	var off = false;
 
 	// listen for any device connects or disconnects
-	iosDeviceModule.on('devicesChanged', function () {
+	iosDeviceModule.on('devicesChanged', function (devices) {
 		off || callback(null, iosDeviceModule.devices());
 	});
 
