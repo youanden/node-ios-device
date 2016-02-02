@@ -81,7 +81,7 @@ public:
 		this->getProp(p, "productVersion",  CFSTR("ProductVersion"));
 		this->getProp(p, "serialNumber",    CFSTR("SerialNumber"));
 		this->getProp(p, "imei",            CFSTR("InternationalMobileEquipmentIdentity"));
-		this->getProp(p, "meid",            CFSTR("InternationalMobileSubscriberIdentity"));
+		this->getProp(p, "meid",            CFSTR("MobileEquipmentIdentifier"));
 
 		props.Reset(p);
 	}
