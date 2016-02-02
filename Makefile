@@ -16,21 +16,9 @@ build = stat node_modules/node-gyp > /dev/null 2>&1 || npm install; \
         $(NODE_GYP) configure --target=$(3) && \
             $(NODE_GYP) build node_ios_device
 
-# Node.js 0.8.x
-node_v1:
-	$(call build,node,nodejs.org,0.8.28)
-
-# Node.js 0.10.x
-node_v11:
-	$(call build,node,nodejs.org,0.10.40)
-
-# Node.js 0.12.x
-node_v14:
-	$(call build,node,nodejs.org,0.12.7)
-
-# Node.js 4.0.x
+# Node.js 4.x
 node_v46:
-	$(call build,node,nodejs.org,4.0.0)
+	$(call build,node,nodejs.org,4.2.1)
 
 clean:
 	$(NODE_GYP) clean

@@ -4,6 +4,23 @@ This fork is built for my requirements, and as such should not be used unless yo
 
 If you came looking for the original repository, check out [this](https://github.com/appcelerator/node-ios-device).
 
+## Prerequisites
+
+node-ios-device is currently compatible with the following versions:
+
+ * Node.js
+   * 0.8.x (module API v1)
+   * 0.10.x (module API v11)
+   * 0.12.x (module API v14)
+   * 4.x (module API v46)
+   * 5.0 (module API v47)
+ * io.js
+   * 1.0.x (module API v42)
+   * \^1.1.0 (module API v43)
+   * 2.x (module API v44)
+   * 3.x (module API v45)
+
+Only Mac OS X is supported.
 
 ## Installation
 
@@ -33,7 +50,7 @@ iosDevice.devices(function (err, devices) {
 	console.log(devices);
 });
 
-// continuously watch for devices to be conected or disconnected
+// continuously watch for devices to be connected or disconnected
 iosDevice.trackDevices(function (err, devices) {
 	console.log('Connected devices:');
 	console.log(devices);
